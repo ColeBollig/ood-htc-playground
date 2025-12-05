@@ -1,10 +1,8 @@
 services:
   ldap:
-    image: ubccr/hpcts:ldap-${HPCTS_VERSION}
     build:
       context: ./ldap
     hostname: ldap
-    container_name: ldap
     environment:
       - CONTAINER_LOG_LEVEL=debug
       - LDAP_RFC2307BIS_SCHEMA=true
@@ -14,7 +12,6 @@ services:
       - compute
 
   base:
-    image: ubccr/hpcts:base-${HPCTS_VERSION}
     build:
       context: ./base
     networks:
@@ -54,11 +51,6 @@ services:
 
   slurmdbd:
     image: ubccr/hpcts:slurm-${HPCTS_VERSION}
-    build:
-      context: ./slurm
-      args:
-        SLURM_VERSION: $SLURM_VERSION
-        HPCTS_VERSION: $HPCTS_VERSION
     command: ["slurmdbd"]
     container_name: slurmdbd
     hostname: slurmdbd
@@ -158,10 +150,6 @@ services:
 
   coldfront:
     image: ubccr/hpcts:coldfront-${HPCTS_VERSION}
-    build:
-      context: ./coldfront
-      args:
-        HPCTS_VERSION: $HPCTS_VERSION
     command: ["serve"]
     hostname: coldfront
     container_name: coldfront
@@ -182,14 +170,12 @@ services:
       - frontend
 
   ondemand:
-    image: ubccr/hpcts:ondemand-${HPCTS_VERSION}
     build:
       context: ./ondemand
       args:
         HPCTS_VERSION: $HPCTS_VERSION
     command: ["serve"]
     hostname: ondemand
-    container_name: ondemand
     networks:
       - compute
     volumes:
@@ -207,10 +193,6 @@ services:
 
   xdmod:
     image: ubccr/hpcts:xdmod-${HPCTS_VERSION}
-    build:
-      context: ./xdmod
-      args:
-        HPCTS_VERSION: $HPCTS_VERSION
     command: ["serve"]
     hostname: xdmod
     container_name: xdmod

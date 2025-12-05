@@ -13,7 +13,7 @@ start() {
     docker compose pull
 
     log_info "Starting HPC Toolset Cluster.."
-    docker compose up -d --no-build
+    docker compose up -d --build --remove-orphans
 
     log_info "Coldfront URL: https://localhost:2443"
     log_info "OnDemand URL: https://localhost:3443"
