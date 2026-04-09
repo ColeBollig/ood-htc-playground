@@ -9,7 +9,6 @@ Live tutorial steps we took during PEARC. See the PEARC video recording to follo
 - [Jupyter App Development Tutorial](#jupyter-app-development-tutorial)
 - [Dynamic Batch Connect Fields](#dynamic-batch-connect-fields)
 - [Passenger App Tutorial](#passenger-app-tutorial)
-- [XDMoD Integration Tutorial](#xdmod-integration-tutorial)
 
 These tutorial will be using the the `hpcadmin` credentials listed in
 [Accessing the Applications](../docs/applications.md).
@@ -66,9 +65,6 @@ you'll see buttons here to relaunch those applications.
 
 The 'Message of the Day' can display your message of the day similar to how shell
 logins work. OnDemand supports many formats, and the one shown is in markdown.
-
-Lastly you'll see panels for [XDMoD](../xdmod/README.md). OnDemand integrates
-with XDMoD to show pertinant information about the jobs you've recently ran.
 
 ![landing page demo](imgs/landing_page_demo.gif)
 
@@ -1615,42 +1611,8 @@ Notes
 
 </details>
 
-## XDMoD Integration Tutorial
-
-<details>
-  <summary>Click to open or close tutorial details.</summary>
-
-<br>
-
-(Optional) submit a job from job composer to demonstrate XDMoD integration with Job Composer:
-
-1. Jobs => Job Composer
-2. Templates
-3. Create New Job (with python template)
-4. Edit Files
-5. Click `jupyter_notebook_data` in tree.
-6. Select `plot_rbm_logistic_classification.py` and click Copy
-7. Go "back" in browser and click Paste
-8. Select script.sh click edit
-9. change `hello.py` to `plot_rbm_logistic_classification.py` and save
-10. Back to Job Composer and submit job
-
-### Enable the integration
-
-Review integration steps (see dashboard MOTD)
-
-1. run command to update config
-2. run command to ingest
-
-Review dashboard widgets - restart Web Server to see
-
-* job efficiency report is based on both core and memory usage but these containers don't gather all the necessary information, which is why they display 100%
-
-Review Job Composer links - access Job Composer
 
 </details>
 
 ## Tutorial Navigation
-[Next Step - Open XDMoD](../xdmod/README.md)  
-[Previous Step - ColdFront](../coldfront/README.md)  
-[Back to Start](../README.md)  
+[Back to Start](../README.md)

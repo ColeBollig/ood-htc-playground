@@ -58,10 +58,6 @@ profiles:
           - width: 8
             widgets:
               - chemistry_notes
-          - width: 4
-            widgets:
-              - xdmod_widget_job_efficiency
-              - xdmod_widget_jobs
 
         - columns:
           - width: 12
