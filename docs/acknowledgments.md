@@ -1,5 +1,9 @@
 ## Acknowledgments
 
+> **Note:** The acknowledgements below are preserved from the upstream repository [hpc-toolset-tutorial](https://github.com/ubccr/hpc-toolset-tutorial) by UBCCR.
+
+---
+
 Thank you to the staff of the [Ohio Supercomputer Center](https://osc.edu), [University at Buffalo Center for Computational Research](https://buffalo.edu/ccr), and [Virginia Tech Advanced Research Computing](https://arc.vt.edu/) for developing this tutorial.  
 
 #### Funding

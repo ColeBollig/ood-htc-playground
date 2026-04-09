@@ -1,116 +1,93 @@
 ## Overview
 
-In this tutorial we present three open source projects that form a core set of utilities commonly installed at High Performance Computing (HPC) centers.
+This repository provides a local test environment for integrating [HTCondor](https://htcondor.org/) with [Open OnDemand](https://openondemand.org/). The environment is composed of four Docker containers:
 
-An overview of the containers in the cluster:
-
-![Container Overview](HPC-Toolset-sm.png)
+- **ldap** — LDAP directory for user authentication across all containers
+- **base** — shared base image used by the other containers
+- **htcondor** — HTCondor submit and execution node (hostname: `htc.mini`)
+- **ondemand** — Open OnDemand portal for browser-based cluster access
 
 ## Requirements
 
 If you haven't already installed and tested the required packages, please refer to the [requirements page](requirements.md)
 
-## Getting started
+## Getting Started
 
-You will need to clone the tutorial repo and then run the helper script.  The initial clone of the repo may take 5-10 minutes.  The first time running the helper script, you'll be downloading all the containers from Docker Hub.  This can take quite a long time depending on your network speed.  The images total approximately 25GB in size.  Once the containers are downloaded, they are started and the services launched.  For point of reference: on a recent test from a home fiber optic network with client connected over wifi this download and container startup process took 12 minutes.  
+Because all container images are built locally from source, you will need to clone the repository and build the images before starting for the first time. The build step compiles all four container images on your machine and may take several minutes depending on your hardware.
 
-
-### Clone Repo and Start Containers
+### Clone Repo and Build Images
 
 ```
-$ git clone https://github.com/ubccr/hpc-toolset-tutorial.git
-$ cd hpc-toolset-tutorial
+$ git clone https://github.com/ColeBollig/ood-htc-playground.git
+$ cd ood-htc-playground
+$ ./hpcts build
+```
+
+The build command will produce output similar to:
+
+```
+ Building images locally
+
+[+] Building 120.3s (42/42) FINISHED
+ => [ldap] ...
+ => [base] ...
+ => [htcondor] ...
+ => [ondemand] ...
+```
+
+### Start Containers
+
+Once the images are built, start the environment:
+
+```
 $ ./hpcts start
-Fetching latest HPC Toolset Images..
 
-[+] Running 12/12
- - base Pulled                                                                              5.2s
- - ondemand Pulled                                                                          5.3s
- - cpn01 Pulled                                                                             5.3s
- - cpn02 Pulled                                                                             5.1s
- - mongodb Pulled                                                                           5.2s
- - xdmod Pulled                                                                             5.1s
- - ldap Pulled                                                                              5.2s
- - mysql Pulled                                                                             5.2s
- - coldfront Pulled                                                                         5.2s
- - frontend Pulled                                                                          5.2s
- - slurmdbd Pulled                                                                          5.1s
- - slurmctld Pulled                                                                         5.2s
+ Fetching latest HPC Toolset Images..
 
-Starting HPC Toolset Cluster..
+ Starting HPC Toolset Cluster..
 
-[+] Running 23/23
- - Network hpc-toolset-tutorial_compute              Created                                0.1s
- - Volume "hpc-toolset-tutorial_etc_slurm"           Created                                0.0s
- - Volume "hpc-toolset-tutorial_cpn02_slurmd_state"  Created                                0.0s
- - Volume "hpc-toolset-tutorial_slurmdbd_state"      Created                                0.0s
- - Volume "hpc-toolset-tutorial_slurmctld_state"     Created                                0.0s
- - Volume "hpc-toolset-tutorial_data_db"             Created                                0.0s
- - Volume "hpc-toolset-tutorial_home"                Created                                0.0s
- - Volume "hpc-toolset-tutorial_var_lib_mysql"       Created                                0.0s
- - Volume "hpc-toolset-tutorial_srv_www"             Created                                0.0s
- - Volume "hpc-toolset-tutorial_cpn01_slurmd_state"  Created                                0.0s
- - Volume "hpc-toolset-tutorial_etc_munge"           Created                                0.0s
- - Container mongodb                                 Started                               12.0s
- - Container mysql                                   Started                               11.9s
- - Container ldap                                    Started                               11.8s
- - Container hpc-toolset-tutorial-base-1             Started                               12.3s
- - Container slurmdbd                                Started                               13.2s
- - Container slurmctld                               Started                               13.0s
- - Container frontend                                Started                               15.2s
- - Container cpn02                                   Started                               14.2s
- - Container cpn01                                   Started                               15.2s
- - Container ondemand                                Started                               15.2s
- - Container coldfront                               Started                               15.7s
- - Container xdmod                                   Started                               15.5s
-
- Coldfront URL: https://localhost:2443
-
+[+] Running 6/6
+ - Network ood-htc-playground_compute    Created                                            0.1s
+ - Volume "ood-htc-playground_etc_munge" Created                                            0.0s
+ - Volume "ood-htc-playground_home"      Created                                            0.0s
+ - Container ldap                        Started                                            3.1s
+ - Container htcondor                    Started                                            5.4s
+ - Container ondemand                    Started                                            7.2s
 
  OnDemand URL: https://localhost:3443
 
-
- XDMoD URL: https://localhost:4443
-
-
- Login to frontend: ssh -p 6222 hpcadmin@localhost
-
+ Login to htc.mini: ssh -p 7222 hpcadmin@localhost
 ```
 
-**NOTE:  Despite seeing this output with URLs, the processes on these containers may not be fully running yet.  Depending on the speed of your computer, starting up the processes may take a few minutes (or even up to 10 minutes).  Use the command below to check the docker logs if the websites are not yet displaying.**
-
-
+> **NOTE: Despite seeing this output, the services inside the containers may take a few additional minutes to fully initialize. If the OnDemand portal is not yet responding, wait a moment and try again, or check the logs as described below.**
 
 ### Docker Logs
 
-Once the helper script finishes you can check the status of the containers:
+Once the helper script finishes you can monitor the status of the containers:
 
 ```
-$ docker-compose logs -f
-mysql        | 200620  4:03:42 [Note] Event Scheduler: Loaded 0 events
-mysql        | 200620  4:03:42 [Note] mysqld: ready for connections.
-frontend     | ---> Starting the MUNGE Authentication service (munged) ...
-frontend     | ---> Starting sshd on the frontend...
-cpn01        | slurmd: Munge credential signature plugin loaded
-cpn01        | slurmd: CPUs=1 Boards=1 Sockets=1 Cores=1 Threads=1 Memory=15575 TmpDisk=229951 Uptime=43696 CPUSpecList=(null) FeaturesAvail=(null) FeaturesActive=(null)
-cpn02        | slurmd: debug:  AcctGatherEnergy NONE plugin loaded
-coldfront    | -- Waiting for database to become active ...
-coldfront    | -- Initializing coldfront database...
-ondemand     | ---> Starting ondemand httpd24...
-slurmdbd     | slurmdbd: debug2: DBD_NODE_STATE_UP: NODE:cpn01 REASON:(null) TIME:1592625828
-slurmctld    | slurmctld: SchedulerParameters=default_queue_depth=100,max_rpc_cnt=0,max_sched_time=2,partition_job_depth=0,sched_max_job_start=0,sched_min_interval=2
-xdmod        | 2020-06-21 19:23:48 [notice] xdmod-ingestor end (process_end_time: 2020-06-21 19:23:48)
-xdmod        | ---> Starting XDMoD...
+$ docker compose logs -f
+ldap         | ---> Starting slapd...
+htcondor     | ---> Starting the MUNGE Authentication service (munged) ...
+htcondor     | ---> Starting HTCondor...
+ondemand     | ---> Starting the MUNGE Authentication service (munged) ...
+ondemand     | ---> Starting ondemand httpd...
 ```
+
+To follow logs for a specific container:
+
+```
+$ docker compose logs -f ondemand
+$ docker compose logs -f htcondor
+```
+
+Wait until you see the `ondemand httpd` service start before attempting to access https://localhost:3443.
 
 ## Something still not right?
 
 Please see our [troubleshooting section](docker_tips.md) for more info.
 
-If errors are showing up in the logs or the services have not all started, check to see which images have been downloaded and which containers are running.  This is what you should see:  
-![](containers_images.PNG)  
-
-If not, run the 'destroy' option of the helper script to shut everything down and remove all volumes.  Then start everything back up again:  
+If errors are showing up in the logs or services have not started, first try destroying the environment and starting again:
 
 ```
 $ ./hpcts destroy
@@ -121,34 +98,28 @@ $ docker volume list
 (Should show no volumes)
 ```
 
-If either of the above do, you should run the corresponding remove command:  
+If either of the above still show entries, remove them manually:
 
 ```
 $ docker container rm [ContainerID]
 $ docker volume rm [VolumeName]
 ```
 
-Then start it all up again:  
+Then start everything back up (images are already built, so this will be quick):
 
 ```
-./hpcts start
+$ ./hpcts start
 ```
 
-Since you already downloaded all the images, this command will only startup the containers and services which only takes a few minutes.  
-
-To completely start over and re-download all images, run the cleanup script and then startup script:  
+To completely start over and rebuild all images from scratch, run the cleanup command followed by build and start:
 
 ```
 $ ./hpcts cleanup
+$ ./hpcts build
 $ ./hpcts start
 ```
-NOTE:  The cleanup script removes ALL containers, images and volumes except the mongo and mariadb images.  If you're getting database errors we recommend you remove these manually with these docker commands:  
 
-```
-$ docker image list  
-$ docker image rm [IMAGE IDs for mongo and mariadb images]  
-$ ./hpcts start  
-```
+> **NOTE: The cleanup command removes ALL local container images. You will need to rebuild before starting again.**
 
 ## Tutorial Navigation
 [Next - Accessing the Applications](applications.md)  
