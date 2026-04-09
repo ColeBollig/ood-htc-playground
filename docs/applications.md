@@ -32,10 +32,30 @@ windows for each user account used in the tutorial and switch between them as yo
 Open OnDemand is used for accessing HPC resources, submitting jobs to a cluster, user file access, etc.
 
 SSH container name: ondemand (must login to front end first)
-URL: https://localhost:3443  
-*Portal Logins include:*  
+URL: https://localhost:3443
+*Portal Logins include:*
 Any of the LDAP accounts listed above.
 Once logged in, click on "Clusters" and then "HPC Cluster Shell Access" and you will be logged in to the cluster frontend container.
+
+If running this example on a remote server a couple of SSH tunnels need to be setup
+in order to access the OnDemand service via a local web browser. For convenience
+scripts are provided in the **remote** directory. To automatically setup all necessary
+tunnels do the following on your local host:
+```
+cd remote
+./setup <hostname>
+```
+
+To see the tunnels execute the following in the **remote** directory:
+```
+./list_tunnels
+```
+
+Once done you can manually remove these tunnels by executing the following in
+the **remote** directory:
+```
+./kill_tunnels
+```
 
 ### HTCondor Node
 

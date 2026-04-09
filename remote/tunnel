@@ -1,0 +1,13 @@
+#!/bin/bash
+
+#set -x
+
+#TODO: Verify args
+
+PORT=${1}
+REMOTE=${2}
+
+ssh -fN -L "${PORT}:localhost:${PORT}" ${REMOTE}
+PID=$(ps -ax | awk "\$0 !~ /awk/" | awk "/${PORT}:localhost:${PORT} ${REMOTE}/ {print \$1}")
+echo "SSH tunnel started with pid: $PID"
+

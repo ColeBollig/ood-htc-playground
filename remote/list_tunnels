@@ -1,0 +1,6 @@
+#!/bin/bash
+
+#set -x
+
+echo "  PID       TUNNEL        REMOTE"
+ps -ax | awk "\$0 !~ /awk/" | awk "/ssh -fN -L [0-9]+:localhost:[0-9]+/ {print \$1, \$7, \$8}" 
