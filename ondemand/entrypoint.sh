@@ -1,16 +1,18 @@
 #!/bin/bash
 set -e
 
+HOST='htc.mini'
+
 if [ "$1" = "serve" ]
 then
-    until nc -vzw 2 frontend 22
+    until nc -vzw 2 $HOST 22
     do
-        echo "-- Waiting for frontend ssh to become active ..."
+        echo "-- Waiting for $HOST ssh to become active ..."
         sleep 2
     done
 
-    echo "---> Populating /etc/ssh/ssh_known_hosts from frontend for ondemand..."
-    /usr/bin/ssh-keyscan frontend >> /etc/ssh/ssh_known_hosts
+    echo "---> Populating /etc/ssh/ssh_known_hosts from $HOST for ondemand..."
+    /usr/bin/ssh-keyscan $HOST >> /etc/ssh/ssh_known_hosts
 
     echo "---> Starting SSSD on ondemand ..."
     # Sometimes on shutdown pid still exists, so delete it
@@ -19,6 +21,9 @@ then
 
     echo "---> Cleaning NGINX ..."
     /opt/ood/nginx_stage/sbin/nginx_stage nginx_clean
+
+    echo "---> Creating munge key"
+    /sbin/create-munge-key
 
     echo "---> Starting the MUNGE Authentication service (munged) on ondemand ..."
     gosu munge /usr/sbin/munged

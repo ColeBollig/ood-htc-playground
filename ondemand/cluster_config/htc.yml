@@ -1,0 +1,16 @@
+---
+v2:
+  metadata:
+    title: "HTC: Mini-Condor"
+  login:
+    host: "htc.mini"
+  job:
+    adapter: "htcondor"
+    bin: "/usr/bin"
+    submit_host: "htc.mini"
+  batch_connect:
+    vnc:
+      script_wrapper: |
+        export PATH="/opt/TurboVNC/bin:$PATH"
+        export WEBSOCKIFY_CMD="/usr/local/bin/websockify"
+        %s

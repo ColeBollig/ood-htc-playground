@@ -1,0 +1,4 @@
+# Open OnDemand specific configuration
+
+# Enable hpcadmin account to manage condor daemons
+ALLOW_ADMINISTRATOR = $(ALLOW_ADMINISTRATOR) hpcadmin@*

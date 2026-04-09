@@ -8,17 +8,21 @@ log_warn() {
   printf "\e[0;33m $1\e[0m\n"
 }
 
+build() {
+    purify
+    log_info "Building images locally"
+    docker compose build --no-cache
+}
+
 start() {
     log_info "Fetching latest HPC Toolset Images.."
     docker compose pull
 
     log_info "Starting HPC Toolset Cluster.."
-    docker compose up -d --build --remove-orphans
+    docker compose up -d --remove-orphans
 
-    log_info "Coldfront URL: https://localhost:2443"
     log_info "OnDemand URL: https://localhost:3443"
-    log_info "XDMoD URL: https://localhost:4443"
-    log_info "Login to frontend: ssh -p 6222 hpcadmin@localhost"
+    log_info "Login to htc.mini: ssh -p 7222 hpcadmin@localhost"
 }
 
 stop() {
@@ -40,12 +44,17 @@ cleanup() {
     read -p "Do you want to proceed? (yes/no) " yn
 
     if [[ $yn == y* ]]; then
-        log_info "Removing HPC Toolset containers and images.."
-        destroy
-        docker rmi $(docker images -f "reference=ubccr/hpcts*" -q)
+        purify
     else
         log_info "cleanup cancelled. existing.."
     fi
+}
+
+purify() {
+    log_info "Removing HPC Toolset containers and images.."
+    destroy
+    docker rmi -f $(docker images | grep ood-htc | awk '{print $1}') 2> /dev/null
+    docker rmi -f $(docker images | grep hpcts-local-base | awk '{print $1}') 2> /dev/null
 }
 
 case "$1" in
@@ -58,11 +67,14 @@ case "$1" in
     'cleanup')
         cleanup
         ;;
+    'build')
+        build
+        ;;
     'destroy')
         destroy
         ;;
     *)
-        log_info "Usage: $0 { start | stop | destroy | cleanup}"
+        log_info "Usage: $0 { build | start | stop | destroy | cleanup}"
         exit 1
         ;;
 esac

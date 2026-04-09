@@ -8,7 +8,7 @@
 # under /etc/ood/config/clusters.d/*.yml
 # @example Use the Owens cluster at Ohio Supercomputer Center
 #     cluster: "owens"
-cluster: "hpc"
+cluster: "htc"
 
 # Define attribute values that aren't meant to be modified by the user within
 # the Dashboard form
@@ -41,11 +41,16 @@ attributes:
 #   option, then it will not appear in the form page that the user sees in the
 #   Dashboard
 
-  bc_num_hours:
+#  bc_num_hours:
+#    display: true
+  cores:
     display: true
-  bc_num_slots:
-    display: true
-    max: 2
+    widget: "number_field"
+    value: 1
+    min: 1
+    max: 32
+    label: "CPU Cores"
+    help: "Number of CPU cores required to run"
   memory:
     widget: "number_field"
     max: 1000
@@ -60,5 +65,4 @@ form:
   - modules
   - extra_jupyter_args
   - memory
-  - bc_num_hours
-  - bc_num_slots
+  - cores

@@ -1,0 +1,16 @@
+---
+title: "HTC Desktop"
+cluster: "htc"
+submit: "submit/htc_submit.yml.erb"
+attributes:
+  desktop: "xfce"
+  bc_num_hours:
+    help: "Max Desktop Runtime"
+    value: 1
+  bc_num_slots:
+    help: "Number of allocated CPU Cores"
+    value: 8
+  bc_account: null
+  bc_queue: null
+  bc_email_on_started: null
+

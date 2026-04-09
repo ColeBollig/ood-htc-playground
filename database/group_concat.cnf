@@ -1,2 +1,0 @@
-[mysqld]
-group_concat_max_len    = 512K
