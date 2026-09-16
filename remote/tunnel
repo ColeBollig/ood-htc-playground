@@ -1,13 +1,44 @@
 #!/bin/bash
 
+set -euo pipefail
+
 #set -x
 
-#TODO: Verify args
+PORT="${1:-}"
+REMOTE="${2:-}"
 
-PORT=${1}
-REMOTE=${2}
+if [[ -z "$PORT" || -z "$REMOTE" ]]; then
+	echo "Usage: $(basename "$0") <port> <remote-host>" >&2
+	exit 1
+fi
 
-ssh -fN -L "${PORT}:localhost:${PORT}" ${REMOTE}
-PID=$(ps -ax | awk "\$0 !~ /awk/" | awk "/${PORT}:localhost:${PORT} ${REMOTE}/ {print \$1}")
-echo "SSH tunnel started with pid: $PID"
+if ! [[ "$PORT" =~ ^[0-9]+$ ]] || (( PORT < 1 || PORT > 65535 )); then
+	echo "Error: PORT must be a number between 1 and 65535 (got '${PORT}')" >&2
+	exit 1
+fi
 
+TUNNEL_DIR="${HOME}/.ssh/tunnels"
+mkdir -p "$TUNNEL_DIR"
+
+PIDFILE="${TUNNEL_DIR}/${PORT}_${REMOTE}.pid"
+
+# One shared control socket per REMOTE (not per port, not per script
+# run): a second tunnel to the same host reuses this connection's
+# existing authentication instead of prompting for a password again.
+CONTROL_PATH="${HOME}/.ssh/connections/tunnel_%C"
+
+# -fN: ssh only backgrounds itself *after* authentication succeeds, so
+# a password/keyboard-interactive prompt still has a real terminal
+# attached to answer it.
+ssh -fN -o ExitOnForwardFailure=yes -o ControlMaster=auto \
+	-o ControlPath="${CONTROL_PATH}" -L "${PORT}:localhost:${PORT}" "${REMOTE}"
+
+PID="$(ssh -O check -o ControlPath="${CONTROL_PATH}" "${REMOTE}" 2>&1 | sed -n 's/.*pid=\([0-9]*\).*/\1/p')"
+
+if [[ -z "$PID" ]]; then
+	echo "Error: tunnel to ${REMOTE} started but couldn't determine its master pid" >&2
+	exit 1
+fi
+
+echo "$PID" > "$PIDFILE"
+echo "Tunnel started: ${PORT} -> ${REMOTE} (pid: $PID)"

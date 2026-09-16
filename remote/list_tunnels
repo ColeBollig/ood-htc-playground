@@ -1,6 +1,26 @@
 #!/bin/bash
 
+set -euo pipefail
+
 #set -x
 
-echo "  PID       TUNNEL        REMOTE"
-ps -ax | awk "\$0 !~ /awk/" | awk "/ssh -fN -L [0-9]+:localhost:[0-9]+/ {print \$1, \$7, \$8}" 
+TUNNEL_DIR="${HOME}/.ssh/tunnels"
+mkdir -p "$TUNNEL_DIR"
+
+printf "%-8s %-6s %-30s %s\n" "PID" "PORT" "REMOTE" "STATUS"
+
+shopt -s nullglob
+for pidfile in "${TUNNEL_DIR}"/*.pid; do
+	base="$(basename "$pidfile" .pid)"
+	PORT="${base%%_*}"
+	REMOTE="${base#*_}"
+	PID="$(cat "$pidfile" 2>/dev/null || echo "?")"
+
+	if [[ "$PID" != "?" ]] && kill -0 "$PID" 2>/dev/null; then
+		STATUS="alive"
+	else
+		STATUS="dead (stale pidfile)"
+	fi
+
+	printf "%-8s %-6s %-30s %s\n" "$PID" "$PORT" "$REMOTE" "$STATUS"
+done

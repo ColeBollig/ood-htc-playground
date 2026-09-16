@@ -1,3 +1,24 @@
 #!/bin/bash
 
-list_tunnels | awk "NR > 1 {print \$1}" | xargs -I {} /bin/zsh -c "echo 'Removing ssh tunnel pid: {}'; kill -9 {}"
+set -euo pipefail
+
+#set -x
+
+TUNNEL_DIR="${HOME}/.ssh/tunnels"
+
+shopt -s nullglob
+for pidfile in "${TUNNEL_DIR}"/*.pid; do
+	base="$(basename "$pidfile" .pid)"
+	PORT="${base%%_*}"
+	REMOTE="${base#*_}"
+	CONTROL_PATH="${HOME}/.ssh/connections/tunnel_%C"
+
+	echo "Stopping tunnel ${PORT} -> ${REMOTE}"
+	# Cancel just this port's forward on the shared master, rather than
+	# killing the master outright -- other ports tunneled to the same
+	# REMOTE stay up.
+	ssh -O cancel -o ControlPath="${CONTROL_PATH}" -L "${PORT}:localhost:${PORT}" "${REMOTE}" 2>/dev/null \
+		|| echo "  (already gone)"
+
+	rm -f "$pidfile"
+done
