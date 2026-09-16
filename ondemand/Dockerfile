@@ -58,6 +58,10 @@ COPY config/dashboard/env /etc/ood/config/apps/dashboard/env
 COPY config/ondemand.yml /etc/ood/config/ondemand.d/ondemand.yml
 COPY config/dashboard/widgets /etc/ood/config/apps/dashboard/views/widgets
 
-COPY htcondor_adapter_patch.rb /opt/ood/ondemand/root/usr/share/gems/3.3/ondemand/4.0.10-1/gems/ood_core-0.29.0/lib/ood_core/job/adapters/htcondor.rb
+COPY htcondor_adapter_patch.rb /tmp/htcondor_adapter_patch.rb
+RUN targets=$(find / -xdev -path "*/gems/ood_core-*/lib/ood_core/job/adapters/htcondor.rb" 2>/dev/null) && \
+    if [ -z "$targets" ]; then echo "ERROR: could not locate ood_core's htcondor.rb to patch" >&2; exit 1; fi && \
+    echo "$targets" | while read -r target; do cp /tmp/htcondor_adapter_patch.rb "$target"; done && \
+    rm /tmp/htcondor_adapter_patch.rb
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
