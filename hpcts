@@ -11,7 +11,11 @@ log_warn() {
 build() {
     purify
     log_info "Building images locally"
-    docker compose build --no-cache
+    # Force classic sequential builds: Compose Bake builds services as isolated
+    # buildx targets and won't see the locally-built hpcts-local-base:latest image
+    # before htcondor/ondemand need it as their FROM base, causing Docker to try
+    # (and fail) to pull it from Docker Hub instead.
+    COMPOSE_BAKE=false docker compose build --no-cache
 }
 
 start() {
